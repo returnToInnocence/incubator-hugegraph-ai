@@ -16,7 +16,7 @@
 # under the License.
 
 
-__all__ = ["huge_settings", "admin_settings", "llm_settings", "resource_path"]
+__all__ = ["huge_settings", "admin_settings", "llm_settings", "resource_path", "prompt"]
 
 import os
 
@@ -26,6 +26,14 @@ from .admin_config import AdminConfig
 from .llm_config import LLMConfig
 
 prompt = PromptConfig()
+
+# Set language for the global prompt instance
+language_setting = os.environ.get("HUGEGRAPH_PROMPT_LANGUAGE", "en").lower()
+if language_setting not in ["en", "zh"]:
+    # print(f"Warning: Unsupported HUGEGRAPH_PROMPT_LANGUAGE '{language_setting}', defaulting to 'en'.")
+    language_setting = "en"
+prompt.set_language(language_setting)
+
 prompt.ensure_yaml_file_exists()
 
 huge_settings = HugeGraphConfig()

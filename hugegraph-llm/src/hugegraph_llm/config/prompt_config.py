@@ -22,7 +22,7 @@ from hugegraph_llm.config.models.base_prompt_config import BasePromptConfig
 # pylint: disable=C0301
 class PromptConfig(BasePromptConfig):
     # Data is detached from llm_op/answer_synthesize.py
-    answer_prompt: str = """You are an expert in the fields of knowledge graphs and natural language processing.
+    answer_prompt_en: str = """You are an expert in the fields of knowledge graphs and natural language processing.
 
 Please provide precise and accurate answers based on the following context information, which is sorted in order of importance from high to low, without using any fabricated knowledge.
 
@@ -38,12 +38,12 @@ Query: {query_str}
 Answer:
 """
 
-    custom_rerank_info: str = """"""
+    custom_rerank_info_en: str = """"""
 
-    default_question: str = """Who is Sarah ?"""
+    default_question_en: str = """Who is Sarah ?"""
 
     # Note: Users should modify the prompt(examples) according to the real schema and text (property_graph_extract.py)
-    extract_graph_prompt: str = """## Main Task
+    extract_graph_prompt_en: str = """## Main Task
 Given the following graph schema and a piece of text, your task is to analyze the text and extract information that fits into the schema's structure, formatting the information into vertices and edges as specified.
 
 ## Basic Rules:
@@ -101,7 +101,7 @@ Meet Sarah, a 30-year-old attorney, and her roommate, James, whom she's shared a
 ### Output example:
 {"vertices":[{"id":"1:Sarah","label":"person","type":"vertex","properties":{"name":"Sarah","age":30,"occupation":"attorney"}},{"id":"1:James","label":"person","type":"vertex","properties":{"name":"James","occupation":"journalist"}}], "edges":[{"id": 1, "label":"roommate","type":"edge","outV":"1:Sarah","outVLabel":"person","inV":"1:James","inVLabel":"person","properties":{"date":"2010"}}]}"""
 
-    graph_schema: str = """{
+    graph_schema_en: str = """{
 "vertexlabels": [
     {
     "id": 1,
@@ -151,10 +151,10 @@ Meet Sarah, a 30-year-old attorney, and her roommate, James, whom she's shared a
 """
 
     # TODO: we should provide a better example to reduce the useless information
-    text2gql_graph_schema: str = "hugegraph"
+    text2gql_graph_schema_en: str = "hugegraph"
 
     # Extracted from llm_op/keyword_extract.py
-    keywords_extract_prompt: str = """Instructions:
+    keywords_extract_prompt_en: str = """Instructions:
     Please perform the following tasks on the text below:
     1. Extract keywords from the text:
        - Minimum 0, maximum MAX_KEYWORDS keywords.
@@ -186,7 +186,7 @@ Meet Sarah, a 30-year-old attorney, and her roommate, James, whom she's shared a
     {question}
     """
 
-    gremlin_generate_prompt = """
+    gremlin_generate_prompt_en = """
 You are an expert in graph query language (Gremlin). Your role is to understand the schema of the graph, recognize the intent behind user queries, and generate accurate Gremlin code based on the given instructions.
 
 ### Tasks
@@ -239,7 +239,7 @@ Generate Gremlin from the Following User Query:
 The generated Gremlin is:
 """
 
-    doc_input_text: str = """Meet Sarah, a 30-year-old attorney, and her roommate, James, whom she's shared a home with since 2010.
+    doc_input_text_en: str = """Meet Sarah, a 30-year-old attorney, and her roommate, James, whom she's shared a home with since 2010.
 James, in his professional life, works as a journalist. Additionally, Sarah is the proud owner of the website
 www.sarahsplace.com, while James manages his own webpage, though the specific URL is not mentioned here.
 These two individuals, Sarah and James, have not only forged a strong personal bond as roommates but have also
@@ -248,7 +248,7 @@ and experiences.
 """
 
     # TODO: we should switch the prompt automatically based on the language (like using context['language'])
-    answer_prompt_CN: str = """你是知识图谱和自然语言处理领域的专家。
+    answer_prompt_zh: str = """你是知识图谱和自然语言处理领域的专家。
 你的任务是基于给定的上下文提供精确和准确的答案。
 
 请根据以下按重要性从高到低排序的上下文信息，提供基于上下文的精确、准确的答案，不使用任何虚构的知识。
@@ -264,7 +264,7 @@ and experiences.
 答案：
 """
 
-    extract_graph_prompt_CN: str = """## 主要任务
+    extract_graph_prompt_zh: str = """## 主要任务
 根据以下图谱和一段文本，你的任务是分析文本并提取符合模式结构的信息，将信息格式化为顶点和边。
 
 ## 基本规则
@@ -301,7 +301,7 @@ and experiences.
 [{"id":"1:Sarah","label":"person","type":"vertex","properties":{"name":"Sarah","age":30,"occupation":"律师"}},{"id":"1:James","label":"person","type":"vertex","properties":{"name":"James","occupation":"记者"}},{"label":"roommate","type":"edge","outV":"1:Sarah","outVLabel":"person","inV":"1:James","inVLabel":"person","properties":{"date":"2010"}}]
 """
 
-    gremlin_generate_prompt_CN: str = """
+    gremlin_generate_prompt_zh: str = """
 你是图查询语言（Gremlin）的专家。你的角色是理解图谱的模式，识别用户查询背后的意图，并根据给定的指令生成准确的Gremlin代码。
 
 ### 任务
@@ -354,7 +354,7 @@ g.V().limit(10)
 生成的Gremlin是：
 """
 
-    keywords_extract_prompt_CN: str = """指令：
+    keywords_extract_prompt_zh: str = """指令：
 请对以下文本执行以下任务：
 1. 从文本中提取关键词：
   - 最少 0 个，最多 MAX_KEYWORDS 个。
@@ -383,7 +383,7 @@ MAX_KEYWORDS: {max_keywords}
 {question}
 """
 
-    doc_input_text_CN: str = """介绍一下Sarah，她是一位30岁的律师，还有她的室友James，他们从2010年开始一起合租。James是一名记者，
+    doc_input_text_zh: str = """介绍一下Sarah，她是一位30岁的律师，还有她的室友James，他们从2010年开始一起合租。James是一名记者，
 职业道路也很出色。另外，Sarah拥有一个个人网站www.sarahsplace.com，而James也经营着自己的网页，不过这里没有提到具体的网址。这两个人，
 Sarah和James，不仅建立起了深厚的室友情谊，还各自在网络上开辟了自己的一片天地，展示着他们各自丰富多彩的兴趣和经历。
 """
