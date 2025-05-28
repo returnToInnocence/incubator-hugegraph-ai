@@ -27,74 +27,115 @@ yaml_file_path = os.path.join(os.getcwd(), "src/hugegraph_llm/resources/demo", F
 
 
 class BasePromptConfig:
-    graph_schema: str = ''
-    extract_graph_prompt: str = ''
-    default_question: str = ''
-    custom_rerank_info: str = ''
-    answer_prompt: str = ''
-    keywords_extract_prompt: str = ''
-    text2gql_graph_schema: str = ''
-    gremlin_generate_prompt: str = ''
-    doc_input_text: str = ''
+    PROMPT_KEYS = [
+        "graph_schema", "extract_graph_prompt", "default_question",
+        "custom_rerank_info", "answer_prompt", "keywords_extract_prompt",
+        "text2gql_graph_schema", "gremlin_generate_prompt", "doc_input_text"
+    ]
+
+    # graph_schema: str = ''
+    # extract_graph_prompt: str = ''
+    # default_question: str = ''
+    # custom_rerank_info: str = ''
+    # answer_prompt: str = ''
+    # keywords_extract_prompt: str = ''
+    # text2gql_graph_schema: str = ''
+    # gremlin_generate_prompt: str = ''
+    # doc_input_text: str = ''
+
+    def __init__(self):
+        self.language = 'en'
+        for key in self.PROMPT_KEYS:
+            setattr(self, f"{key}_en", '')
+            setattr(self, f"{key}_zh", '')
+        self.ensure_yaml_file_exists()
+
+    def set_language(self, lang: str):
+        if lang in ['en', 'zh']:
+            self.language = lang
+        else:
+            # Optionally log a warning or raise an error for unsupported languages
+            log.warning(f"Unsupported language '{lang}' specified. Defaulting to 'en'.")
+            self.language = 'en'
+
+    @property
+    def graph_schema(self):
+        if self.language == 'zh':
+            return getattr(self, 'graph_schema_zh', getattr(self, 'graph_schema_en', ''))
+        return getattr(self, 'graph_schema_en', '')
+
+    @property
+    def extract_graph_prompt(self):
+        if self.language == 'zh':
+            return getattr(self, 'extract_graph_prompt_zh', getattr(self, 'extract_graph_prompt_en', ''))
+        return getattr(self, 'extract_graph_prompt_en', '')
+
+    @property
+    def default_question(self):
+        if self.language == 'zh':
+            return getattr(self, 'default_question_zh', getattr(self, 'default_question_en', ''))
+        return getattr(self, 'default_question_en', '')
+
+    @property
+    def custom_rerank_info(self):
+        if self.language == 'zh':
+            return getattr(self, 'custom_rerank_info_zh', getattr(self, 'custom_rerank_info_en', ''))
+        return getattr(self, 'custom_rerank_info_en', '')
+
+    @property
+    def answer_prompt(self):
+        if self.language == 'zh':
+            return getattr(self, 'answer_prompt_zh', getattr(self, 'answer_prompt_en', ''))
+        return getattr(self, 'answer_prompt_en', '')
+
+    @property
+    def keywords_extract_prompt(self):
+        if self.language == 'zh':
+            return getattr(self, 'keywords_extract_prompt_zh', getattr(self, 'keywords_extract_prompt_en', ''))
+        return getattr(self, 'keywords_extract_prompt_en', '')
+
+    @property
+    def text2gql_graph_schema(self):
+        if self.language == 'zh':
+            return getattr(self, 'text2gql_graph_schema_zh', getattr(self, 'text2gql_graph_schema_en', ''))
+        return getattr(self, 'text2gql_graph_schema_en', '')
+
+    @property
+    def gremlin_generate_prompt(self):
+        if self.language == 'zh':
+            return getattr(self, 'gremlin_generate_prompt_zh', getattr(self, 'gremlin_generate_prompt_en', ''))
+        return getattr(self, 'gremlin_generate_prompt_en', '')
+
+    @property
+    def doc_input_text(self):
+        if self.language == 'zh':
+            return getattr(self, 'doc_input_text_zh', getattr(self, 'doc_input_text_en', ''))
+        return getattr(self, 'doc_input_text_en', '')
 
     def ensure_yaml_file_exists(self):
         if os.path.exists(yaml_file_path):
             log.info("Loading prompt file '%s' successfully.", F_NAME)
             with open(yaml_file_path, "r", encoding="utf-8") as file:
                 data = yaml.safe_load(file)
-                # Load existing values from the YAML file into the class attributes
-                for key, value in data.items():
-                    setattr(self, key, value)
+                if data:  # Ensure data is not None
+                    # Load existing values from the YAML file into the class attributes
+                    for key, value in data.items():
+                        setattr(self, key, value)
         else:
             self.generate_yaml_file()
             log.info("Prompt file '%s' doesn't exist, create it.", yaml_file_path)
 
     def save_to_yaml(self):
-        indented_schema = "\n".join([f"  {line}" for line in self.graph_schema.splitlines()])
-        indented_text2gql_schema = "\n".join([f"  {line}" for line in self.text2gql_graph_schema.splitlines()])
-        indented_gremlin_prompt = "\n".join([f"  {line}" for line in self.gremlin_generate_prompt.splitlines()])
-        indented_example_prompt = "\n".join([f"    {line}" for line in self.extract_graph_prompt.splitlines()])
-        indented_question = "\n".join([f"    {line}" for line in self.default_question.splitlines()])
-        indented_custom_related_information = (
-            "\n".join([f"    {line}" for line in self.custom_rerank_info.splitlines()])
-        )
-        indented_default_answer_template = "\n".join([f"    {line}" for line in self.answer_prompt.splitlines()])
-        indented_keywords_extract_template = (
-            "\n".join([f"    {line}" for line in self.keywords_extract_prompt.splitlines()])
-        )
-        indented_doc_input_text = "\n".join([f"  {line}" for line in self.doc_input_text.splitlines()])
+        prompts_to_save = {}
+        for key in self.PROMPT_KEYS:
+            prompts_to_save[f"{key}_en"] = getattr(self, f"{key}_en", "")
+            prompts_to_save[f"{key}_zh"] = getattr(self, f"{key}_zh", "")
 
-        # This can be extended to add storage fields according to the data needs to be stored
-        yaml_content = f"""graph_schema: |
-{indented_schema}
+        # Ensure directory exists before writing
+        os.makedirs(os.path.dirname(yaml_file_path), exist_ok=True)
 
-text2gql_graph_schema: |
-{indented_text2gql_schema}
-
-extract_graph_prompt: |
-{indented_example_prompt}
-
-default_question: |
-{indented_question}
-
-custom_rerank_info: |
-{indented_custom_related_information}
-
-answer_prompt: |
-{indented_default_answer_template}
-
-keywords_extract_prompt: |
-{indented_keywords_extract_template}
-
-gremlin_generate_prompt: |
-{indented_gremlin_prompt}
-
-doc_input_text: |
-{indented_doc_input_text}
-
-"""
         with open(yaml_file_path, "w", encoding="utf-8") as file:
-            file.write(yaml_content)
+            yaml.dump(prompts_to_save, file, allow_unicode=True, default_flow_style=False, sort_keys=False, width=float("inf"))
 
     def generate_yaml_file(self):
         if os.path.exists(yaml_file_path):
